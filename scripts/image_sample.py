@@ -5,7 +5,7 @@ numpy array. This can be used to produce samples for FID evaluation.
 
 import argparse
 import os
-
+import datetime
 import numpy as np
 import torch as th
 import torch.distributed as dist
@@ -91,10 +91,10 @@ def main():
 def create_argparser():
     defaults = dict(
         clip_denoised=True,
-        num_samples=10000,
+        num_samples=10,
         batch_size=16,
         use_ddim=False,
-        model_path="",
+        model_path="/data/GAN_project/diffusion_tries/microtubules/openai-2023-04-06-23-20-39-202051/ema_0.9999_046000.pt",
     )
     defaults.update(model_and_diffusion_defaults())
     parser = argparse.ArgumentParser()
@@ -103,4 +103,13 @@ def create_argparser():
 
 
 if __name__ == "__main__":
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    with np.load('/data/GAN_project/diffusion_tries/openai-2023-04-07-08-28-30-702952/samples_10x256x256x3.npz') as data:
+       lst = data.files
+       for item in data[lst[0]]:
+           plt.imshow(item)
+           plt.show()
+    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
     main()

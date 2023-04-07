@@ -3,7 +3,9 @@ Train a diffusion model on images.
 """
 
 import argparse
-
+import os
+import numpy as np
+import datetime
 from improved_diffusion import dist_util, logger
 from improved_diffusion.image_datasets import load_data
 from improved_diffusion.resample import create_named_schedule_sampler
@@ -14,9 +16,10 @@ from improved_diffusion.script_util import (
     add_dict_to_argparser,
 )
 from improved_diffusion.train_util import TrainLoop
-
+import torch
 
 def main():
+    torch.cuda.empty_cache()
     args = create_argparser().parse_args()
 
     dist_util.setup_dist()
@@ -26,6 +29,9 @@ def main():
     model, diffusion = create_model_and_diffusion(
         **args_to_dict(args, model_and_diffusion_defaults().keys())
     )
+    logger.log(f"number of model parameters:{sum([np.prod(p.size()) for p in model.parameters()])}")
+    logger.log(f"args: {args_to_dict(args, model_and_diffusion_defaults().keys())}")
+    logger.log(f"channel multiplier: {model.channel_mult}")
     model.to(dist_util.dev())
     schedule_sampler = create_named_schedule_sampler(args.schedule_sampler, diffusion)
 
@@ -58,20 +64,23 @@ def main():
 
 
 def create_argparser():
-    defaults = dict(
-        data_dir="",
+    defaults = dict(data_dir="/data/GAN_project/microtubules/onit/HR/patches_256x256_ol0.25/",
         schedule_sampler="uniform",
         lr=1e-4,
         weight_decay=0.0,
         lr_anneal_steps=0,
-        batch_size=1,
+        batch_size=10,
         microbatch=-1,  # -1 disables microbatches
         ema_rate="0.9999",  # comma-separated list of EMA values
-        log_interval=10,
-        save_interval=10000,
+        log_interval=500,
+        save_interval=2000,
         resume_checkpoint="",
         use_fp16=False,
         fp16_scale_growth=1e-3,
+        num_channels = 64,
+        num_res_blocks = 1,
+        diffusion_steps =1000,
+        image_size = 256
     )
     defaults.update(model_and_diffusion_defaults())
     parser = argparse.ArgumentParser()
@@ -80,4 +89,6 @@ def create_argparser():
 
 
 if __name__ == "__main__":
+    print('hey')
+    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
     main()

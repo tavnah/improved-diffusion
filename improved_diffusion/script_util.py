@@ -13,9 +13,9 @@ def model_and_diffusion_defaults():
     Defaults for image training.
     """
     return dict(
-        image_size=64,
-        num_channels=128,
-        num_res_blocks=2,
+        image_size=256,
+        num_channels=32,
+        num_res_blocks=1,
         num_heads=4,
         num_heads_upsample=-1,
         attention_resolutions="16,8",
@@ -97,9 +97,9 @@ def create_model(
     dropout,
 ):
     if image_size == 256:
-        channel_mult = (1, 1, 2, 2, 4, 4)
+        channel_mult = (1, 1, 2, 2, 2, 2)
     elif image_size == 64:
-        channel_mult = (1, 2, 3, 4)
+        channel_mult = (1, 2, 2, 2)
     elif image_size == 32:
         channel_mult = (1, 2, 2, 2)
     else:
@@ -201,7 +201,7 @@ def sr_create_model(
     _ = small_size  # hack to prevent unused variable
 
     if large_size == 256:
-        channel_mult = (1, 1, 2, 2, 4, 4)
+        channel_mult = (1, 1, 2, 2, 2, 2)
     elif large_size == 64:
         channel_mult = (1, 2, 3, 4)
     else:
