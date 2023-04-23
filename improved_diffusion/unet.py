@@ -63,7 +63,7 @@ class Upsample(nn.Module):
         self.use_conv = use_conv
         self.dims = dims
         if use_conv:
-            self.conv = conv_nd(dims, channels, channels, 1, padding=1) #TODO: it was 3
+            self.conv = conv_nd(dims, channels, channels, 3, padding=1)
 
     def forward(self, x):
         assert x.shape[1] == self.channels
@@ -95,7 +95,7 @@ class Downsample(nn.Module):
         self.dims = dims
         stride = 2 if dims != 3 else (1, 2, 2)
         if use_conv:
-            self.op = conv_nd(dims, channels, channels, 1, stride=stride, padding=1) #TODO: it was 3
+            self.op = conv_nd(dims, channels, channels, 3, stride=stride, padding=1)
         else:
             self.op = avg_pool_nd(stride)
 
@@ -142,7 +142,7 @@ class ResBlock(TimestepBlock):
         self.in_layers = nn.Sequential(
             normalization(channels),
             SiLU(),
-            conv_nd(dims, channels, self.out_channels, 1, padding=1), #TODO: it was 3
+            conv_nd(dims, channels, self.out_channels, 3, padding=1),
         )
         self.emb_layers = nn.Sequential(
             SiLU(),
@@ -156,7 +156,7 @@ class ResBlock(TimestepBlock):
             SiLU(),
             nn.Dropout(p=dropout),
             zero_module(
-                conv_nd(dims, self.out_channels, self.out_channels, 1, padding=1) #TODO: it was 3
+                conv_nd(dims, self.out_channels, self.out_channels, 3, padding=1)
             ),
         )
 
@@ -164,7 +164,8 @@ class ResBlock(TimestepBlock):
             self.skip_connection = nn.Identity()
         elif use_conv:
             self.skip_connection = conv_nd(
-                dims, channels, self.out_channels, 1, padding=1) #TODO: it was 3
+                dims, channels, self.out_channels, 3, padding=1
+            )
         else:
             self.skip_connection = conv_nd(dims, channels, self.out_channels, 1)
 
@@ -211,7 +212,7 @@ class AttentionBlock(nn.Module):
         self.use_checkpoint = use_checkpoint
 
         self.norm = normalization(channels)
-        self.qkv = conv_nd(1, channels, channels * 1, 1) #TODO: it was channels * 3
+        self.qkv = conv_nd(1, channels, channels * 3, 1)
         self.attention = QKVAttention()
         self.proj_out = zero_module(conv_nd(1, channels, channels, 1))
 
@@ -241,7 +242,7 @@ class QKVAttention(nn.Module):
         :param qkv: an [N x (C * 3) x T] tensor of Qs, Ks, and Vs.
         :return: an [N x C x T] tensor after attention.
         """
-        ch = qkv.shape[1] // 1 #TODO: it was // 3
+        ch = qkv.shape[1] // 3
         q, k, v = th.split(qkv, ch, dim=1)
         scale = 1 / math.sqrt(math.sqrt(ch))
         weight = th.einsum(
@@ -345,7 +346,7 @@ class UNetModel(nn.Module):
         self.input_blocks = nn.ModuleList(
             [
                 TimestepEmbedSequential(
-                    conv_nd(dims, in_channels, model_channels, 1, padding=1) #TODO: it was 3
+                    conv_nd(dims, in_channels, model_channels, 3, padding=1)
                 )
             ]
         )
@@ -432,7 +433,7 @@ class UNetModel(nn.Module):
         self.out = nn.Sequential(
             normalization(ch),
             SiLU(),
-            zero_module(conv_nd(dims, model_channels, out_channels, 1, padding=1)), #TODO: it was 3
+            zero_module(conv_nd(dims, model_channels, out_channels, 3, padding=1)),
         )
 
     def convert_to_fp16(self):
