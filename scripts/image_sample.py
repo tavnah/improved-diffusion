@@ -94,7 +94,11 @@ def create_argparser():
         num_samples=10,
         batch_size=16,
         use_ddim=False,
-        model_path="/data/GAN_project/diffusion_tries/microtubules/openai-2023-04-06-23-20-39-202051/ema_0.9999_046000.pt",
+        model_path="/data/GAN_project/diffusion_tries/mitochondria/tav/openai-2023-04-11-15-39-06-467363/ema_0.9999_164000.pt",
+        # image_size=64,
+        # num_channels=64,
+        # num_res_blocks=1,
+        # noise_schedule="linear",
     )
     defaults.update(model_and_diffusion_defaults())
     parser = argparse.ArgumentParser()
@@ -106,10 +110,10 @@ if __name__ == "__main__":
     import numpy as np
     import matplotlib.pyplot as plt
 
-    with np.load('/data/GAN_project/diffusion_tries/openai-2023-04-07-08-28-30-702952/samples_10x256x256x3.npz') as data:
-       lst = data.files
-       for item in data[lst[0]]:
-           plt.imshow(item)
-           plt.show()
-    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+    # with np.load('/data/GAN_project/diffusion_tries/samples/openai-2023-04-09-19-44-45-388527/samples_10x64x64x3.npz') as data:
+    #    lst = data.files
+    #    for item in data[lst[0]]:
+    #        plt.imshow(item)
+    #        plt.show()
+    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/samples/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
     main()

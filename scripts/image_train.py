@@ -64,7 +64,7 @@ def main():
 
 
 def create_argparser():
-    defaults = dict(data_dir="/data/GAN_project/microtubules/onit/HR/patches_256x256_ol0.25/",
+    defaults = dict(data_dir="/data/GAN_project/onit/HR/mitochondria/patches_256x256_ol0.25/",
         schedule_sampler="uniform",
         lr=1e-4,
         weight_decay=0.0,
@@ -77,7 +77,7 @@ def create_argparser():
         resume_checkpoint="",
         use_fp16=False,
         fp16_scale_growth=1e-3,
-        num_channels = 64,
+        num_channels = 32,
         num_res_blocks = 1,
         diffusion_steps =1000,
         image_size = 256
@@ -89,6 +89,5 @@ def create_argparser():
 
 
 if __name__ == "__main__":
-    print('hey')
-    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/mitochondria/tav/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
     main()

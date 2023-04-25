@@ -71,36 +71,41 @@ def find_similar_patch_for_generated_patches(generated_patches_path, image_folde
     with np.load(generated_patches_path) as data:
         lst = data.files
         total_patches_num = len(data[lst[0]])
-        rows_num = 2
-        cols_num = (total_patches_num * 2) // rows_num
-        plt.figure(figsize=(30, 8))
+        rows_num = 3
+        cols_num = total_patches_num
+        plt.figure(figsize=(30, 10))
         for i, patch in enumerate(data[lst[0]]):
             bw_patch = color.rgb2gray(patch)
             if np.max(bw_patch) < 2:
                 bw_patch = bw_patch * 255
                 bw_patch = np.uint8(bw_patch)
             aug_patch, similar_patch, _ = find_most_similar_patch(bw_patch, image_folder_path, resize_factor)
+            diff_patches = np.array([aug_patch, similar_patch, np.zeros_like(aug_patch)])
             plt.subplot(rows_num, cols_num, i+1)
             plt.imshow(aug_patch, cmap='gray')
             plt.title(f'patch {i}')
             plt.subplot(rows_num, cols_num, i+1+cols_num)
             plt.imshow(similar_patch, cmap='gray')
             plt.title(f'matched patch {i}')
+            plt.subplot(rows_num, cols_num, i + 1 + 2*cols_num)
+            plt.imshow(diff_patches.T)
+            plt.title(f'diff {i}')
+
         plt.show()
 
 
 
 if __name__ == "__main__":
-    #orig_patches_folder = '/data/GAN_project/microtubules/onit/HR'
-    orig_patches_folder = '/data/GAN_project/mitochondria/onit/HR'
+    orig_patches_folder = '/data/GAN_project/microtubules/onit/HR'
+    #orig_patches_folder = '/data/GAN_project/mitochondria/onit/HR'
 
     #patch = plt.imread('/data/GAN_project/microtubules/onit/HR/try/patches/patch59.jpg')
     #image = plt.imread('/data/GAN_project/microtubules/onit/HR/try/microtubules_i_50_exp_t_30msec002 - STORM image.tif')
     #find_similar_patch(patch, orig_patches_folder)
 
-    #patches_path = '/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz' microtubules
-    patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-04-11-15-37-42-886600/samples_10x64x64x3.npz' #mitochondria
-    find_similar_patch_for_generated_patches(patches_path, orig_patches_folder,1)
+    patches_path = '/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz' #microtubules
+    #patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-04-11-15-37-42-886600/samples_10x64x64x3.npz' #mitochondria
+    find_similar_patch_for_generated_patches(patches_path, orig_patches_folder,4 )
 
     # with np.load('/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz') as data:
     #    lst = data.files
