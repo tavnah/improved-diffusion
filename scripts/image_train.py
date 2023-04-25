@@ -64,7 +64,7 @@ def main():
 
 
 def create_argparser():
-    defaults = dict(data_dir="/data/GAN_project/mitochondria/patches_256x256_ol0.25/",
+    defaults = dict(data_dir="/data/GAN_project/onit/HR/mitochondria/patches_256x256_ol0.25/",
         schedule_sampler="uniform",
         lr=1e-4,
         weight_decay=0.0,
