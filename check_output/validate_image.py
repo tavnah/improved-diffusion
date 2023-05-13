@@ -103,9 +103,16 @@ if __name__ == "__main__":
     #image = plt.imread('/data/GAN_project/microtubules/onit/HR/try/microtubules_i_50_exp_t_30msec002 - STORM image.tif')
     #find_similar_patch(patch, orig_patches_folder)
 
-    patches_path = '/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz' #microtubules
+    #patches_path = '/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz' #microtubules
     #patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-04-11-15-37-42-886600/samples_10x64x64x3.npz' #mitochondria
-    find_similar_patch_for_generated_patches(patches_path, orig_patches_folder,4 )
+    patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-04-26-15-04-29-012512/samples_10x256x256x3.npz' #mitochondria 256 80000
+    patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-04-29-17-40-37-521308/samples_10x256x256x3.npz' #mitochondria 256 10000
+    patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-04-29-18-23-24-267052/samples_10x256x256x3.npz' #mitochondria 256 70000
+    patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-04-30-08-06-41-095522/samples_10x256x256x3.npz' #mitochondria 256 80000+36000
+
+    patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-05-01-21-53-15-163588/samples_10x256x256x3.npz' #microtubuls 256 v2 data
+    patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-05-02-08-03-36-590047/samples_10x256x256x3.npz' # microtubuls 256 v2 data after lr 1e-6
+    find_similar_patch_for_generated_patches(patches_path, orig_patches_folder,1 )
 
     # with np.load('/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz') as data:
     #    lst = data.files

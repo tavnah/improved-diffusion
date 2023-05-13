@@ -42,6 +42,7 @@ def main():
         image_size=args.image_size,
         class_cond=args.class_cond,
     )
+    logger.log(f"data dir: {args.data_dir}")
 
     logger.log("training...")
     TrainLoop(
@@ -64,9 +65,9 @@ def main():
 
 
 def create_argparser():
-    defaults = dict(data_dir="/data/GAN_project/onit/HR/mitochondria/patches_256x256_ol0.25/",
+    defaults = dict(data_dir="/data/GAN_project/microtubules/onit/HR/patches_256x256_ol0.25_v2",
         schedule_sampler="uniform",
-        lr=1e-4,
+        lr=1e-6,
         weight_decay=0.0,
         lr_anneal_steps=0,
         batch_size=10,
@@ -74,10 +75,10 @@ def create_argparser():
         ema_rate="0.9999",  # comma-separated list of EMA values
         log_interval=500,
         save_interval=2000,
-        resume_checkpoint="",
+        resume_checkpoint="/data/GAN_project/diffusion_tries/microtubules/tav/v2_data/openai-2023-05-01-23-13-59-389351/ema_0.9999_040000.pt",
         use_fp16=False,
         fp16_scale_growth=1e-3,
-        num_channels = 32,
+        num_channels = 64,
         num_res_blocks = 1,
         diffusion_steps =1000,
         image_size = 256
@@ -89,5 +90,5 @@ def create_argparser():
 
 
 if __name__ == "__main__":
-    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/mitochondria/tav/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/v2_data/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
     main()

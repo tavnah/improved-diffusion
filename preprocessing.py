@@ -117,6 +117,33 @@ def show_patches(patches, n_rows, n_cols):
             axs[i, j].imshow(patches[i*n_cols + j], cmap='gray')
     plt.show()
 
+# def remove_outliers(patch):
+#     '''
+#     The function get a patch and remove outliers from it.
+#     '''
+#     patch = patch.astype(np.float32)
+#     patch = patch - np.mean(patch)
+#     patch = patch / np.std(patch)
+#     patch = np.clip(patch, -3, 3)
+#     patch = patch + 3
+#     patch = patch / 6
+#     patch = patch * 255
+#     return patch
+
+def remove_outliers(patch):
+    '''
+    the function get a patch and remove the outliers, according to the q1, q3.
+    and them normalize it between 0-255.
+    '''
+    q1 = np.quantile(patch, 0.01)
+    q3 = np.quantile(patch, 0.99)
+    iqr = q3 - q1
+    patch[patch > q3 + 1.5 * iqr] = q3 + 1.5 * iqr
+    patch[patch < q1 - 1.5 * iqr] = q1 - 1.5 * iqr
+    patch = (patch - np.min(patch)) / (np.max(patch) - np.min(patch))
+    patch = patch * 255
+    return patch
+
 def save_patches(patches, output_folder):
     '''
     save the patches to a folder as jpg images.
@@ -130,6 +157,7 @@ def save_patches(patches, output_folder):
     for i, patch in enumerate(patches):
         patch = patch.squeeze()
         patch = patch.numpy()
+        patch = remove_outliers(patch)
         patch = patch.astype(np.uint8)
         patch = Image.fromarray(patch)
         patch.save(output_folder / f"patch{i}.jpg")
@@ -141,10 +169,32 @@ if __name__ == '__main__':
     #    for item in data[lst[0]]:
     #        plt.imshow(item)
     #        plt.show()
+    #
+    # fldr = '/data/GAN_project/microtubules/onit/HR/patches_256x256_ol0.25_v2'
+    # imgs_fldr = PosixPath(fldr)
+    #
+    # for image in imgs_fldr.iterdir():
+    #     if image.is_file():
+    #         image_path = image.__fspath__()
+    #         if "nd2" in image.suffix:
+    #             nd = ND2Reader(image_path)
+    #             img_arr = nd.get_frame(0)
+    #             tensor_img = torch.tensor(np.array([np.int16(img_arr)]))
+    #         else:
+    #             try:
+    #                 img = Image.open(image_path)
+    #             except:
+    #                 print("error - this file is not an image: ", image_path)
+    #                 continue
+    #             convert_tensor = transforms.ToTensor()
+    #             tensor_img = convert_tensor(img)
+    #             if torch.max(tensor_img) == 1:
+    #                 tensor_img = tensor_img * 255
+    #             plt.imshow(img)
 
 
     #main_fldr = r"C:\Users\tav33\Documents\GAN_big\try_data\DL"
-    main_fldr = "/data/GAN_project/microtubules/onit/HR"
+    main_fldr = "/data/GAN_project/microtubules/onit/HR/try"
     patch_size = (256, 256)
     overlap = 0.25
     crop_start = (0,0)
@@ -152,7 +202,7 @@ if __name__ == '__main__':
     pixel_size = 0.11e-6
     #labels_path ='/data/GAN_project/labels_try_data.csv'
     #labels_path = r'C:\Users\tav33\Courses\ProjectGAN\labels_try_data.csv'
-    output_folder = '/data/GAN_project/microtubules/onit/HR/patches_256x256_ol0.25_v2'
+    output_folder = '/data/GAN_project/microtubules/onit/HR/try/patches'
     patches, orig_images= create_patches_for_type(main_fldr, patch_size, overlap, crop_start, n_rotations)
     save_patches(patches, output_folder)
     # from micro_dataset import MicroscopePatchesDataset
