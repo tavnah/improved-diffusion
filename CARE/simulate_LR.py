@@ -9,23 +9,22 @@ from CARE.CSBDeep.csbdeep.io import save_training_data
 
 
 
-def get_LR_HR_couples(patches_path, output_folder, image_path_for_mu_sigma, NA, lamda, pixel_size):
+def get_LR_HR_couples(patches_path, output_path, image_path_for_mu_sigma, NA, lamda, pixel_size):
     with np.load(patches_path) as data:
         #patches_amount = len(data.files)
         patches = data[data.files[0]]
-        xy_shape = (patches.shape[0],1,patches.shape[1],patches.shape[2])
+        xy_shape = (patches.shape[0],1,1,patches.shape[1],patches.shape[2])
         X = np.zeros(xy_shape)
         Y = np.zeros(xy_shape)
-        output_path = output_folder + '/train_data.npz'
 
         for i, patch in enumerate(patches):
             patch = color.rgb2gray(patch)
             patch = (patch - np.min(patch)) / (np.max(patch) - np.min(patch))
             patch = ((patch*254) + 1).astype('uint8') # for poisson lamda not to be 0
             LR_patch = LR_from_HR(patch, image_path_for_mu_sigma, NA, lamda, pixel_size, show_progress=False)
-            Y[i, 0, :, :] = patch
-            X[i, 0, :, :] = LR_patch
-            save_training_data(output_path, X, Y, 'CZYX')
+            Y[i, 0, 0, :, :] = patch
+            X[i, 0, 0, :, :] = LR_patch
+        save_training_data(output_path, X, Y, 'SCZYX')
 
             #save LR_patch to output_folder/low, save patch to output_folder/high, using numpy
 
@@ -51,7 +50,7 @@ def LR_from_HR(HR_patch, image_path_for_mu_sigma, NA, lamda, pixel_size, show_pr
     #add gaussian noise
     mu, std = calculate_mu_sigma_from_tiff(image_path_for_mu_sigma)
     gaussian_noise = np.random.normal(mu, std, hr_convolved_poisson.shape)
-    hr_convolved_poisson_gaussian = hr_convolved_poisson + (1/3)*gaussian_noise
+    hr_convolved_poisson_gaussian = hr_convolved_poisson + (1/5)*gaussian_noise
 
     #show figure of original patch, patch after perlin noise, patch after convolution, patch after poisson noise, patch after gaussian noise
     if show_progress:
@@ -88,8 +87,8 @@ if __name__ == '__main__':
     NA = 1.46
     pixel_size = 0.11e-6 # m
     output_folder = '/data/GAN_project/CARE/simulated_LR'
-
-    get_LR_HR_couples(patches_path, output_folder, image_path_for_mu_sigma, NA, lamda, pixel_size)
+    output_path = output_folder + '/train_data.npz'
+    get_LR_HR_couples(patches_path, output_path, image_path_for_mu_sigma, NA, lamda, pixel_size)
 
 
     # with np.load(patches_path) as data:

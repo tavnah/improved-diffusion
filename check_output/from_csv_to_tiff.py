@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 
 
-def from_csv_to_tiff(T, img_size, scale, csv_file , pixel_size , dir_path):
+def from_csv_to_tiff(T, img_size, scale, csv_file , pixel_size , dir_path, output_folder):
     image = np.zeros([T, img_size * scale, img_size * scale])
     i = 0
     with open(os.path.join(dir_path, '{}.csv'.format(csv_file)), 'r') as read_obj:
@@ -37,10 +37,20 @@ def from_csv_to_tiff(T, img_size, scale, csv_file , pixel_size , dir_path):
                   int(y),
                   int(x)] += 1
             i += 1
+    image_no_out = remove_outliers(image)
+    image_new = image_no_out[0].astype('uint8')
+    im = Image.fromarray(image_new)
+    im.save(os.path.join(output_folder, '{}.tiff'.format(csv_file)))
 
-def convert_to_tiff_csv_folder(csv_folder, output_folder, T, img_size, scale, csv_file , pixel_size , dir_path):
 
-    return
+def convert_to_tiff_csv_folder(dir_path, output_folder, T, img_size, scale , pixel_size ):
+    '''
+    the function get a folder with csv files and convert them to tiff files, and save each file in output folder.
+    '''
+    for file in os.listdir(dir_path):
+        if file.endswith(".csv"):
+            file_name = file.split('.')[0]
+            from_csv_to_tiff(T, img_size, scale, file_name , pixel_size , dir_path, output_folder)
 
 def remove_outliers(patch):
     '''
@@ -56,20 +66,14 @@ def remove_outliers(patch):
     patch = patch * 255
     return patch
 
-image_no_out = remove_outliers(image)
 
 
-image_uint8 = (image_no_out[0]).astype(np.uint8)
-img = Image.fromarray(image_uint8)
-img.save("/data/GAN_project/csv_files"+)
-
-plt.imshow(image_no_out[0])
-plt.show()
-
-if __name__ = '__main__':
+if __name__ == '__main__':
     img_size = 256  # low resolution image hight/ width
     scale = 10  # int(0.1609743 /106)  #resolution improvement
     pixel_size = 106  # nm #original image pixel size  (effective pixel size = 106 nm)
     T = 1  # tiff stack length - is it the frames?
     csv_file = 'alpha_tubulin_cell8'  # name of the csv file
     dir_path = "/data/GAN_project/csv_files"
+    output_folder = "/data/GAN_project/tiff_files"
+    convert_to_tiff_csv_folder(dir_path, output_folder, T, img_size, scale, pixel_size)
