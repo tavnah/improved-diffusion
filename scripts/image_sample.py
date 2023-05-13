@@ -94,7 +94,7 @@ def create_argparser():
         num_samples=10,
         batch_size=16,
         use_ddim=False,
-        model_path="/data/GAN_project/diffusion_tries/mitochondria/tav/openai-2023-04-11-15-39-06-467363/ema_0.9999_164000.pt",
+        model_path="/data/GAN_project/diffusion_tries/microtubules/tav/v2_data/openai-2023-05-01-23-13-59-389351/ema_0.9999_040000.pt",
         # image_size=64,
         # num_channels=64,
         # num_res_blocks=1,
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     import numpy as np
     import matplotlib.pyplot as plt
 
-    # with np.load('/data/GAN_project/diffusion_tries/samples/openai-2023-04-09-19-44-45-388527/samples_10x64x64x3.npz') as data:
+    # with np.load('/data/GAN_project/diffusion_tries/samples/openai-2023-04-26-15-04-29-012512/samples_10x256x256x3.npz') as data:
     #    lst = data.files
     #    for item in data[lst[0]]:
     #        plt.imshow(item)
