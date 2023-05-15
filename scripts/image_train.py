@@ -90,5 +90,5 @@ def create_argparser():
 
 
 if __name__ == "__main__":
-    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/only_good_imgs/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/maia/shareloc_data/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
     main()

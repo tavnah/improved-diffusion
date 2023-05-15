@@ -71,7 +71,6 @@ def crop_to_patches(image, top, left, patch_height, patch_width, overlap):
 
 def create_patches_for_type(images_folder_path, patch_size, overlap, crop_start, n_rotations=None):
     '''
-    I NEED TO CHECK THE FUNCTION
     The function get a folder with images, divides each image to patches, and take each patch and creates augmentations.
     :param images_folder: folder path as string
     :return: patches_all: tensor of patches tensors.
@@ -194,15 +193,15 @@ if __name__ == '__main__':
 
 
     #main_fldr = r"C:\Users\tav33\Documents\GAN_big\try_data\DL"
-    main_fldr = "/data/GAN_project/microtubules/onit/HR/only_good_imgs"
+    main_fldr = "/data/GAN_project/tiff_files/good"
     patch_size = (256, 256)
     overlap = 0.25
     crop_start = (0,0)
     n_rotations = 2
-    pixel_size = 0.11e-6
+    pixel_size = 106e-9
     #labels_path ='/data/GAN_project/labels_try_data.csv'
     #labels_path = r'C:\Users\tav33\Courses\ProjectGAN\labels_try_data.csv'
-    output_folder = '/data/GAN_project/microtubules/onit/HR/only_good_imgs/patches_ol0.25'
+    output_folder = '/data/GAN_project/microtubules/shareloc/1305'
     patches, orig_images= create_patches_for_type(main_fldr, patch_size, overlap, crop_start, n_rotations)
     save_patches(patches, output_folder)
     # from micro_dataset import MicroscopePatchesDataset
