@@ -32,7 +32,7 @@ def find_similar_patch_augment(patch, image):
     patch3 = cv2.rotate(patch1, cv2.ROTATE_180)
 
     patches = [patch0, patch1, patch2, patch3]
-    current_max = 0
+    current_max = -1000
     for patch in patches:
         similar_patch, max_val = find_similar_patch_from_one_image(patch, image)
         if current_max < max_val:
@@ -45,7 +45,7 @@ def find_most_similar_patch(patch, images_folder_path, resize_factor=1):
     patch - black and white patch, uint8
     '''
     images_folder = PosixPath(images_folder_path)
-    current_max = 0
+    current_max = -1000
     for image in images_folder.iterdir():
         if image.is_file():
             image_path = image.__fspath__()
@@ -98,10 +98,13 @@ def find_similar_patch_for_generated_patches(generated_patches_path, image_folde
 if __name__ == "__main__":
     orig_patches_folder = '/data/GAN_project/microtubules/onit/HR'
     #orig_patches_folder = '/data/GAN_project/mitochondria/onit/HR'
-
+    orig_patches_folder = '/data/GAN_project/tiff_files/good'
+    orig_patches_folder = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/patches_ol0.25'
     #patch = plt.imread('/data/GAN_project/microtubules/onit/HR/try/patches/patch59.jpg')
     #image = plt.imread('/data/GAN_project/microtubules/onit/HR/try/microtubules_i_50_exp_t_30msec002 - STORM image.tif')
     #find_similar_patch(patch, orig_patches_folder)
+    orig_patches_folder = r'C:\Users\tav33\Downloads\shareloc'
+
 
     #patches_path = '/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz' #microtubules
     #patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-04-11-15-37-42-886600/samples_10x64x64x3.npz' #mitochondria
@@ -112,6 +115,11 @@ if __name__ == "__main__":
 
     patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-05-01-21-53-15-163588/samples_10x256x256x3.npz' #microtubuls 256 v2 data
     patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-05-02-08-03-36-590047/samples_10x256x256x3.npz' # microtubuls 256 v2 data after lr 1e-6
+
+    patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-14-10-21-29-732845/samples_10x256x256x3.npz' #shareloc images
+    patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-16-08-18-48-268574/samples_10x256x256x3.npz' #shareloc images, scale 4, longer run
+
+    patches_path = r'C:\Users\tav33\Courses\ProjectGAN\data\patches_q0.01q0.99'
     find_similar_patch_for_generated_patches(patches_path, orig_patches_folder,1 )
 
     # with np.load('/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz') as data:

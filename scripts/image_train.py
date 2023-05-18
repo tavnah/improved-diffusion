@@ -65,7 +65,7 @@ def main():
 
 
 def create_argparser():
-    defaults = dict(data_dir="/data/GAN_project/microtubules/shareloc/1305",
+    defaults = dict(data_dir="/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/patches_ol0.25",
         schedule_sampler="uniform",
         lr=1e-4,
         weight_decay=0.0,
@@ -80,7 +80,7 @@ def create_argparser():
         fp16_scale_growth=1e-3,
         num_channels = 64,
         num_res_blocks = 1,
-        diffusion_steps =1000,
+        diffusion_steps =5000,
         image_size = 256
     )
     defaults.update(model_and_diffusion_defaults())
@@ -90,5 +90,5 @@ def create_argparser():
 
 
 if __name__ == "__main__":
-    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/only_good_imgs/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/alpha_tubulin_scale_4/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
     main()

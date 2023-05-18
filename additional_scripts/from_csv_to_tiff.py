@@ -70,10 +70,10 @@ def remove_outliers(patch):
 
 if __name__ == '__main__':
     img_size = 256  # low resolution image hight/ width
-    scale = 10  # int(0.1609743 /106)  #resolution improvement
+    scale = 4  # int(0.1609743 /106)  #resolution improvement
     pixel_size = 106  # nm #original image pixel size  (effective pixel size = 106 nm)
     T = 1  # tiff stack length - is it the frames?
-    csv_file = 'alpha_tubulin_cell8'  # name of the csv file
+    #csv_file = 'alpha_tubulin_cell8'  # name of the csv file
     dir_path = "/data/GAN_project/csv_files"
-    output_folder = "/data/GAN_project/tiff_files"
+    output_folder = "/data/GAN_project/tiff_files/alpha_tubulin_scale_4"
     convert_to_tiff_csv_folder(dir_path, output_folder, T, img_size, scale, pixel_size)

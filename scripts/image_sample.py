@@ -51,7 +51,7 @@ def main():
         )
         sample = sample_fn(
             model,
-            (args.batch_size, 1, args.image_size, args.image_size),
+            (args.batch_size, 3, args.image_size, args.image_size),
             clip_denoised=args.clip_denoised,
             model_kwargs=model_kwargs,
         )
@@ -94,7 +94,7 @@ def create_argparser():
         num_samples=10,
         batch_size=16,
         use_ddim=False,
-        model_path="/data/GAN_project/diffusion_tries/microtubules/tav/v2_data/openai-2023-05-01-23-13-59-389351/ema_0.9999_040000.pt",
+        model_path="/data/GAN_project/diffusion_tries/microtubules/tav/alpha_tubulin_scale_4/openai-2023-05-14-22-55-10-152965/ema_0.9999_060000.pt",
         # image_size=64,
         # num_channels=64,
         # num_res_blocks=1,
@@ -115,5 +115,5 @@ if __name__ == "__main__":
     #    for item in data[lst[0]]:
     #        plt.imshow(item)
     #        plt.show()
-    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/samples/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/samples/shareloc/1305/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
     main()
