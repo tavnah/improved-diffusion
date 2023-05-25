@@ -21,9 +21,9 @@ def model_and_diffusion_defaults():
         attention_resolutions="16,8",
         dropout=0.0,
         learn_sigma=False,
-        sigma_small=False,
+        sigma_small= False,#False, TODO: change back if needed
         class_cond=False,
-        diffusion_steps=5000,
+        diffusion_steps=2000,
         noise_schedule="cosine",
         timestep_respacing="",
         use_kl=False,

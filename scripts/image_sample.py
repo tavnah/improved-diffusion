@@ -20,8 +20,9 @@ from improved_diffusion.script_util import (
 )
 
 
-def main():
-    args = create_argparser().parse_args()
+def main(model_path, output_path):
+    os.environ["OPENAI_LOGDIR"] = output_path
+    args = create_argparser(model_path).parse_args()
 
     dist_util.setup_dist()
     logger.configure()
@@ -35,7 +36,8 @@ def main():
     )
     model.to(dist_util.dev())
     model.eval()
-
+    print("diffusion steps:", diffusion.num_timesteps)
+    print("model var type:", diffusion.model_var_type)
     logger.log("sampling...")
     all_images = []
     all_labels = []
@@ -49,6 +51,7 @@ def main():
         sample_fn = (
             diffusion.p_sample_loop if not args.use_ddim else diffusion.ddim_sample_loop
         )
+
         sample = sample_fn(
             model,
             (args.batch_size, 3, args.image_size, args.image_size),
@@ -88,13 +91,13 @@ def main():
     logger.log("sampling complete")
 
 
-def create_argparser():
+def create_argparser(model_path):
     defaults = dict(
         clip_denoised=True,
-        num_samples=10,
+        num_samples=100,
         batch_size=16,
         use_ddim=False,
-        model_path="/data/GAN_project/diffusion_tries/microtubules/tav/alpha_tubulin_scale_4/openai-2023-05-14-22-55-10-152965/ema_0.9999_060000.pt",
+        model_path=model_path,
         # image_size=64,
         # num_channels=64,
         # num_res_blocks=1,
@@ -115,5 +118,6 @@ if __name__ == "__main__":
     #    for item in data[lst[0]]:
     #        plt.imshow(item)
     #        plt.show()
-    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/samples/shareloc/1305/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
-    main()
+    output_path = "/data/GAN_project/diffusion_tries/samples/shareloc/1305/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+    model_path = "/data/GAN_project/diffusion_tries/microtubules/tav/alpha_tubulin_scale_4/openai-2023-05-18-23-45-52-473911/ema_0.9999_046000.pt"
+    main(model_path, output_path)

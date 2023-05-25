@@ -4,6 +4,7 @@ https://github.com/hojonathanho/diffusion/blob/1e0dceb3b3495bbe19116a5e1b3596cd0
 
 Docstrings have been added, as well as DDIM sampling and a new collection of beta schedules.
 """
+import datetime
 
 import enum
 import math
@@ -259,6 +260,8 @@ class GaussianDiffusion:
         assert t.shape == (B,)
         model_output = model(x, self._scale_timesteps(t), **model_kwargs)
 
+        #time1 = datetime.datetime.now()
+        #print("time1: {}".format(time1))
         if self.model_var_type in [ModelVarType.LEARNED, ModelVarType.LEARNED_RANGE]:
             assert model_output.shape == (B, C * 2, *x.shape[2:])
             model_output, model_var_values = th.split(model_output, C, dim=1)
@@ -275,6 +278,7 @@ class GaussianDiffusion:
                 model_log_variance = frac * max_log + (1 - frac) * min_log
                 model_variance = th.exp(model_log_variance)
         else:
+            #print("time11: {}".format(datetime.datetime.now()))
             model_variance, model_log_variance = {
                 # for fixedlarge, we set the initial (log-)variance like so
                 # to get a better decoder log likelihood.
@@ -287,8 +291,14 @@ class GaussianDiffusion:
                     self.posterior_log_variance_clipped,
                 ),
             }[self.model_var_type]
+            #print("time12: {}".format(datetime.datetime.now()))
             model_variance = _extract_into_tensor(model_variance, t, x.shape)
+            #print("time13: {}".format(datetime.datetime.now()))
             model_log_variance = _extract_into_tensor(model_log_variance, t, x.shape)
+            #print("time14: {}".format(datetime.datetime.now()))
+        #time2 = datetime.datetime.now()
+        #print("time2: {}".format(time2))
+        #print("time2 - time1: {}".format(time2 - time1))
 
         def process_xstart(x):
             if denoised_fn is not None:
@@ -462,6 +472,7 @@ class GaussianDiffusion:
 
             indices = tqdm(indices)
 
+        t0 = datetime.datetime.now()
         for i in indices:
             t = th.tensor([i] * shape[0], device=device)
             with th.no_grad():
@@ -475,6 +486,8 @@ class GaussianDiffusion:
                 )
                 yield out
                 img = out["sample"]
+        t1 = datetime.datetime.now()
+        print("Time taken for one step: ", t1 - t0)
 
     def ddim_sample(
         self,

@@ -5,15 +5,18 @@ import matplotlib.pyplot as plt
 from libtiff import TIFF
 from scipy.ndimage import gaussian_filter
 from skimage import color
+from PIL import Image
 from CARE.CSBDeep.csbdeep.io import save_training_data
 
 
 
-def get_LR_HR_couples(patches_path, output_path, image_path_for_mu_sigma, NA, lamda, pixel_size):
+def get_LR_HR_couples(patches_path, output_folder, image_path_for_mu_sigma, NA, lamda, pixel_size):
+    output_path = output_folder + '/train_data.npz'
+
     with np.load(patches_path) as data:
         #patches_amount = len(data.files)
         patches = data[data.files[0]]
-        xy_shape = (patches.shape[0],1,1,patches.shape[1],patches.shape[2])
+        xy_shape = (patches.shape[0],patches.shape[1],patches.shape[2])
         X = np.zeros(xy_shape)
         Y = np.zeros(xy_shape)
 
@@ -22,9 +25,13 @@ def get_LR_HR_couples(patches_path, output_path, image_path_for_mu_sigma, NA, la
             patch = (patch - np.min(patch)) / (np.max(patch) - np.min(patch))
             patch = ((patch*254) + 1).astype('uint8') # for poisson lamda not to be 0
             LR_patch = LR_from_HR(patch, image_path_for_mu_sigma, NA, lamda, pixel_size, show_progress=False)
-            Y[i, 0, 0, :, :] = patch
-            X[i, 0, 0, :, :] = LR_patch
-        save_training_data(output_path, X, Y, 'SCZYX')
+            LR_image = Image.fromarray(LR_patch)
+            HR_image = Image.fromarray(patch)
+            LR_image.save(output_folder + '/low/' + str(i) + '.tif')
+            HR_image.save(output_folder + '/high/' + str(i) + '.tif')
+            #Y[i, :, :] = patch
+            #X[i, :, :] = LR_patch
+        #save_training_data(output_path, X, Y, 'CXY')
 
             #save LR_patch to output_folder/low, save patch to output_folder/high, using numpy
 
@@ -86,9 +93,9 @@ if __name__ == '__main__':
     lamda = 488e-9 # m
     NA = 1.46
     pixel_size = 0.11e-6 # m
-    output_folder = '/data/GAN_project/CARE/simulated_LR'
+    output_folder = '/data/GAN_project/CARE/simulated_LR/train_data'
     output_path = output_folder + '/train_data.npz'
-    get_LR_HR_couples(patches_path, output_path, image_path_for_mu_sigma, NA, lamda, pixel_size)
+    get_LR_HR_couples(patches_path, output_folder, image_path_for_mu_sigma, NA, lamda, pixel_size)
 
 
     # with np.load(patches_path) as data:

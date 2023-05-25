@@ -13,7 +13,9 @@ import torch
 
 def find_similar_patch_from_one_image(patch, image):
 
-    result = cv2.matchTemplate(image, patch, cv2.TM_CCOEFF_NORMED)
+    result = cv2.matchTemplate(image, patch, cv2.TM_CCOEFF)
+    #result = cv2.matchTemplate(image, patch, cv2.TM_CCORR)
+    #result = cv2.matchTemplate(image, patch, cv2.TM_SQDIFF)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
     match_top_left = max_loc
     # Get the size of the template
@@ -32,7 +34,7 @@ def find_similar_patch_augment(patch, image):
     patch3 = cv2.rotate(patch1, cv2.ROTATE_180)
 
     patches = [patch0, patch1, patch2, patch3]
-    current_max = -1000
+    current_max = -1000000000
     for patch in patches:
         similar_patch, max_val = find_similar_patch_from_one_image(patch, image)
         if current_max < max_val:
@@ -80,7 +82,11 @@ def find_similar_patch_for_generated_patches(generated_patches_path, image_folde
                 bw_patch = bw_patch * 255
                 bw_patch = np.uint8(bw_patch)
             aug_patch, similar_patch, _ = find_most_similar_patch(bw_patch, image_folder_path, resize_factor)
-            diff_patches = np.array([aug_patch, similar_patch, np.zeros_like(aug_patch)])
+            diff_patches = np.zeros((aug_patch.shape[0],aug_patch.shape[1],3))
+            diff_patches[:,:,0] = aug_patch
+            diff_patches[:,:,1] = similar_patch
+            diff_patches = diff_patches.astype(np.uint8)
+
             plt.subplot(rows_num, cols_num, i+1)
             plt.imshow(aug_patch, cmap='gray')
             plt.title(f'patch {i}')
@@ -88,22 +94,56 @@ def find_similar_patch_for_generated_patches(generated_patches_path, image_folde
             plt.imshow(similar_patch, cmap='gray')
             plt.title(f'matched patch {i}')
             plt.subplot(rows_num, cols_num, i + 1 + 2*cols_num)
-            plt.imshow(diff_patches.T)
+            plt.imshow(diff_patches)
             plt.title(f'diff {i}')
 
         plt.show()
 
+def show_10_patches(generated_patches_path):
+    with np.load(generated_patches_path) as data:
+        lst = data.files
+        total_patches_num = len(data[lst[0]])
+        rows_num = 2
+        cols_num = 5
+        plt.figure(figsize=(30, 10))
+        for i, patch in enumerate(data[lst[0]]):
+            plt.subplot(rows_num, cols_num, i+1)
+            plt.imshow(patch)
+            plt.title(f'patch {i}')
+        plt.show()
+
+def check_script_with_exist_path(patch_path, images_folder_path, resize_factor=1):
+
+    patch = plt.imread(patch_path)
+    patch = color.rgb2gray(patch)
+    if np.max(patch) < 2:
+        patch = patch * 255
+    patch = np.uint8(patch)
+    patch_couple = find_most_similar_patch(patch, images_folder_path, resize_factor)
+    plt.figure(figsize=(10, 10))
+    plt.subplot(1, 2, 1)
+    plt.imshow(patch_couple[0], cmap='gray')
+    plt.title('patch')
+    plt.subplot(1, 2, 2)
+    plt.imshow(patch_couple[1], cmap='gray')
+    plt.title('matched patch')
+    plt.show()
 
 
 if __name__ == "__main__":
+    #patch_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/patches_o0.25/patch218_3.jpg'
+    #images_folder_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/HR_image'
+    #check_script_with_exist_path(patch_path,images_folder_path)
+
+
     orig_patches_folder = '/data/GAN_project/microtubules/onit/HR'
     #orig_patches_folder = '/data/GAN_project/mitochondria/onit/HR'
     orig_patches_folder = '/data/GAN_project/tiff_files/good'
-    orig_patches_folder = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/patches_ol0.25'
+    #orig_patches_folder = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/patches_ol0.25'
     #patch = plt.imread('/data/GAN_project/microtubules/onit/HR/try/patches/patch59.jpg')
     #image = plt.imread('/data/GAN_project/microtubules/onit/HR/try/microtubules_i_50_exp_t_30msec002 - STORM image.tif')
     #find_similar_patch(patch, orig_patches_folder)
-    orig_patches_folder = r'C:\Users\tav33\Downloads\shareloc'
+    #orig_patches_folder = r'C:\Users\tav33\Downloads\shareloc'
 
 
     #patches_path = '/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz' #microtubules
@@ -118,9 +158,13 @@ if __name__ == "__main__":
 
     patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-14-10-21-29-732845/samples_10x256x256x3.npz' #shareloc images
     patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-16-08-18-48-268574/samples_10x256x256x3.npz' #shareloc images, scale 4, longer run
-
-    patches_path = r'C:\Users\tav33\Courses\ProjectGAN\data\patches_q0.01q0.99'
-    find_similar_patch_for_generated_patches(patches_path, orig_patches_folder,1 )
+    patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-18-23-30-07-355647/samples_10x256x256x3.npz' #shareloc images, scale 4, 2000 steps
+    patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-19-08-22-07-172546/samples_10x256x256x3.npz' #shareloc images, scale 4, 2000 steps, breakpoint from one above
+    patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-19-08-48-46-030054/samples_10x256x256x3.npz' # minimum loss of the above
+    #patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-19-17-06-44-051174/samples_10x256x256x3.npz' #scale 4, 3000 steps
+    #patches_path = r'C:\Users\tav33\Courses\ProjectGAN\data\patches_q0.01q0.99'
+    #show_10_patches(patches_path)
+    find_similar_patch_for_generated_patches(patches_path, orig_patches_folder,3 )
 
     # with np.load('/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz') as data:
     #    lst = data.files
