@@ -638,7 +638,7 @@ class GaussianDiffusion:
             from tqdm.auto import tqdm
 
             indices = tqdm(indices)
-
+        t0 = datetime.datetime.now()
         for i in indices:
             t = th.tensor([i] * shape[0], device=device)
             with th.no_grad():
@@ -653,6 +653,8 @@ class GaussianDiffusion:
                 )
                 yield out
                 img = out["sample"]
+        t1 = datetime.datetime.now()
+        print("Time taken for one step: ", t1 - t0)
 
     def _vb_terms_bpd(
         self, model, x_start, x_t, t, clip_denoised=True, model_kwargs=None

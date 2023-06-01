@@ -19,7 +19,6 @@ from improved_diffusion.train_util import TrainLoop
 import torch
 
 def main():
-    torch.cuda.empty_cache()
     args = create_argparser().parse_args()
 
     dist_util.setup_dist()
@@ -78,10 +77,7 @@ def create_argparser():
         resume_checkpoint="",
         use_fp16=False,
         fp16_scale_growth=1e-3,
-        num_channels = 64,
-        num_res_blocks = 1,
-        diffusion_steps =5000,
-        image_size = 256
+
     )
     defaults.update(model_and_diffusion_defaults())
     parser = argparse.ArgumentParser()
@@ -91,4 +87,5 @@ def create_argparser():
 
 if __name__ == "__main__":
     os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/alpha_tubulin_scale_4/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/only_good_imgs/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
     main()

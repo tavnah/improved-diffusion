@@ -94,9 +94,9 @@ def main(model_path, output_path):
 def create_argparser(model_path):
     defaults = dict(
         clip_denoised=True,
-        num_samples=10,
+        num_samples=100,
         batch_size=10,
-        use_ddim=True,
+        use_ddim=False,
         model_path=model_path,
         # image_size=64,
         # num_channels=64,
