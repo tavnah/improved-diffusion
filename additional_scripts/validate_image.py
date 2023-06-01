@@ -103,10 +103,12 @@ def show_10_patches(generated_patches_path):
     with np.load(generated_patches_path) as data:
         lst = data.files
         total_patches_num = len(data[lst[0]])
+        ten_patches = data[lst[0]][:10]
         rows_num = 2
         cols_num = 5
-        plt.figure(figsize=(30, 10))
-        for i, patch in enumerate(data[lst[0]]):
+        #plt.figure(figsize=(30, 10))
+        plt.figure(figsize=(30, 25))
+        for i, patch in enumerate(ten_patches):
             plt.subplot(rows_num, cols_num, i+1)
             plt.imshow(patch)
             plt.title(f'patch {i}')
@@ -134,6 +136,7 @@ if __name__ == "__main__":
     #patch_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/patches_o0.25/patch218_3.jpg'
     #images_folder_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/HR_image'
     #check_script_with_exist_path(patch_path,images_folder_path)
+    show_10_patches('/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-01-09-20-48-674744/samples_10x256x256x3.npz')
 
 
     orig_patches_folder = '/data/GAN_project/microtubules/onit/HR'
@@ -164,7 +167,9 @@ if __name__ == "__main__":
     #patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-19-17-06-44-051174/samples_10x256x256x3.npz' #scale 4, 3000 steps
     #patches_path = r'C:\Users\tav33\Courses\ProjectGAN\data\patches_q0.01q0.99'
     #show_10_patches(patches_path)
-    find_similar_patch_for_generated_patches(patches_path, orig_patches_folder,3 )
+
+
+    #find_similar_patch_for_generated_patches(patches_path, orig_patches_folder,3 )
 
     # with np.load('/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz') as data:
     #    lst = data.files

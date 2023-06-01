@@ -195,6 +195,7 @@ if __name__ == '__main__':
 
     #main_fldr = r"C:\Users\tav33\Documents\GAN_big\try_data\DL"
     main_fldr = "/data/GAN_project/tiff_files/alpha_tubulin_scale_4"
+    main_fldr = "/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/HR_image"
     patch_size = (256, 256)
     overlap = 0.25
     crop_start = (0,0)
@@ -203,6 +204,7 @@ if __name__ == '__main__':
     #labels_path ='/data/GAN_project/labels_try_data.csv'
     #labels_path = r'C:\Users\tav33\Courses\ProjectGAN\labels_try_data.csv'
     output_folder = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/patches_ol0.25'
+    output_folder = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/patches_o0.25'
     patches, orig_images= create_patches_for_type(main_fldr, patch_size, overlap, crop_start, n_rotations)
     save_patches(patches, output_folder)
     # from micro_dataset import MicroscopePatchesDataset

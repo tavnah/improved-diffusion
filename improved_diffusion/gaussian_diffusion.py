@@ -424,6 +424,7 @@ class GaussianDiffusion:
         :param progress: if True, show a tqdm progress bar.
         :return: a non-differentiable batch of samples.
         """
+        print("using p_sample")
         final = None
         for sample in self.p_sample_loop_progressive(
             model,
@@ -589,6 +590,7 @@ class GaussianDiffusion:
 
         Same usage as p_sample_loop().
         """
+        print("using DDIM")
         final = None
         for sample in self.ddim_sample_loop_progressive(
             model,
