@@ -26,8 +26,8 @@ def from_csv_to_tiff(T, img_size, scale, csv_file , pixel_size , dir_path, outpu
             #    i += 1
             #    continue
             # check that indices do not exceed image size
-            x = float(my_data[2])*scale/pixel_size
-            y = float(my_data[3])*scale/pixel_size
+            x = float(my_data[1])*scale/pixel_size
+            y = float(my_data[2])*scale/pixel_size
             if(int(y) < 0 or
                     int(x) < 0 or
                     int(y) >= img_size*scale or
@@ -57,8 +57,8 @@ def remove_outliers(patch):
     the function get a patch and remove the outliers, according to the q1, q3.
     and them normalize it between 0-255.
     '''
-    q1 = np.quantile(patch, 0.05)
-    q3 = np.quantile(patch, 0.95)
+    q1 = np.quantile(patch, 0.01)
+    q3 = np.quantile(patch, 0.99)
     iqr = q3 - q1
     patch[patch > q3 + 1.5 * iqr] = q3 + 1.5 * iqr
     patch[patch < q1 - 1.5 * iqr] = q1 - 1.5 * iqr
@@ -71,9 +71,9 @@ def remove_outliers(patch):
 if __name__ == '__main__':
     img_size = 256  # low resolution image hight/ width
     scale = 4  # int(0.1609743 /106)  #resolution improvement
-    pixel_size = 106  # nm #original image pixel size  (effective pixel size = 106 nm)
+    pixel_size = 160  # nm #original image pixel size  (effective pixel size = 106 nm)
     T = 1  # tiff stack length - is it the frames?
     #csv_file = 'alpha_tubulin_cell8'  # name of the csv file
-    dir_path = "/data/GAN_project/csv_files"
-    output_folder = "/data/GAN_project/tiff_files/alpha_tubulin_scale_4"
+    dir_path = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/1"
+    output_folder = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/1"
     convert_to_tiff_csv_folder(dir_path, output_folder, T, img_size, scale, pixel_size)

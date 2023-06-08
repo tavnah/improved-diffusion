@@ -9,6 +9,8 @@ import datetime
 import numpy as np
 import torch as th
 import torch.distributed as dist
+import sys
+sys.path.append('/data/GAN_project/scripts')
 
 from improved_diffusion import dist_util, logger
 from improved_diffusion.script_util import (
@@ -20,13 +22,14 @@ from improved_diffusion.script_util import (
 )
 
 
-def main(model_path, output_path):
+def main(model_path, output_path, diffusion_steps, patch_size, images_num):
     os.environ["OPENAI_LOGDIR"] = output_path
-    args = create_argparser(model_path).parse_args()
+    args = create_argparser(model_path,images_num).parse_args()
 
     dist_util.setup_dist()
     logger.configure()
-
+    args.image_size = patch_size
+    args.diffusion_steps = diffusion_steps
     logger.log("creating model and diffusion...")
     model, diffusion = create_model_and_diffusion(
         **args_to_dict(args, model_and_diffusion_defaults().keys())
@@ -91,10 +94,10 @@ def main(model_path, output_path):
     logger.log("sampling complete")
 
 
-def create_argparser(model_path):
+def create_argparser(model_path, images_num):
     defaults = dict(
         clip_denoised=True,
-        num_samples=100,
+        num_samples=images_num,
         batch_size=10,
         use_ddim=False,
         model_path=model_path,
@@ -120,4 +123,10 @@ if __name__ == "__main__":
     #        plt.show()
     output_path = "/data/GAN_project/diffusion_tries/samples/shareloc/1305/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
     model_path = "/data/GAN_project/diffusion_tries/microtubules/tav/alpha_tubulin_scale_4/openai-2023-05-18-23-45-52-473911/ema_0.9999_046000.pt"
-    main(model_path, output_path)
+    patch_size = 256
+    diffusion_steps = 2000
+    for i in range(1, 10):
+        images_num = i * 300
+        main(model_path, output_path, diffusion_steps, patch_size, images_num)
+    #images_num = 200
+    #main(model_path, output_path, diffusion_steps,patch_size, images_num)

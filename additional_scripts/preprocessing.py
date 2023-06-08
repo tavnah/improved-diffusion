@@ -134,8 +134,10 @@ def remove_outliers(patch):
     the function get a patch and remove the outliers, according to the q1, q3.
     and them normalize it between 0-255.
     '''
-    q1 = np.quantile(patch, 0.01)
-    q3 = np.quantile(patch, 0.99)
+    #q1 = np.quantile(patch, 0.01)
+    q1 = np.quantile(patch, 0.25)
+    #q3 = np.quantile(patch, 0.99)
+    q3 = np.quantile(patch, 0.75)
     iqr = q3 - q1
     patch[patch > q3 + 1.5 * iqr] = q3 + 1.5 * iqr
     patch[patch < q1 - 1.5 * iqr] = q1 - 1.5 * iqr

@@ -13,7 +13,7 @@ import torch
 
 def find_similar_patch_from_one_image(patch, image):
 
-    result = cv2.matchTemplate(image, patch, cv2.TM_CCOEFF)
+    result = cv2.matchTemplate(image, patch, cv2.TM_SQDIFF_NORMED)
     #result = cv2.matchTemplate(image, patch, cv2.TM_CCORR)
     #result = cv2.matchTemplate(image, patch, cv2.TM_SQDIFF)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
@@ -121,6 +121,7 @@ def check_script_with_exist_path(patch_path, images_folder_path, resize_factor=1
     if np.max(patch) < 2:
         patch = patch * 255
     patch = np.uint8(patch)
+    patch[patch == 255] = 0
     patch_couple = find_most_similar_patch(patch, images_folder_path, resize_factor)
     plt.figure(figsize=(10, 10))
     plt.subplot(1, 2, 1)
@@ -133,10 +134,10 @@ def check_script_with_exist_path(patch_path, images_folder_path, resize_factor=1
 
 
 if __name__ == "__main__":
-    #patch_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/patches_o0.25/patch218_3.jpg'
-    #images_folder_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/HR_image'
-    #check_script_with_exist_path(patch_path,images_folder_path)
-    show_10_patches('/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-01-09-20-48-674744/samples_10x256x256x3.npz')
+    patch_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/patches_o0.25/patch218_3.jpg'
+    images_folder_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/HR_image'
+    check_script_with_exist_path(patch_path,images_folder_path)
+    #show_10_patches('/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-01-09-20-48-674744/samples_10x256x256x3.npz')
 
 
     orig_patches_folder = '/data/GAN_project/microtubules/onit/HR'
