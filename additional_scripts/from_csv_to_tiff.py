@@ -38,7 +38,7 @@ def from_csv_to_tiff(T, img_size, scale, csv_file , pixel_size , dir_path, outpu
                   int(x)] += 1
             i += 1
     image_no_out = remove_outliers(image)
-    image_new = image_no_out[0].astype('uint8')
+    image_new = image_no_out[0].astype('float32')
     im = Image.fromarray(image_new)
     im.save(os.path.join(output_folder, '{}.tiff'.format(csv_file)))
 
@@ -63,7 +63,7 @@ def remove_outliers(patch):
     patch[patch > q3 + 1.5 * iqr] = q3 + 1.5 * iqr
     patch[patch < q1 - 1.5 * iqr] = q1 - 1.5 * iqr
     patch = (patch - np.min(patch)) / (np.max(patch) - np.min(patch))
-    patch = patch * 255
+    #patch = patch * 255
     return patch
 
 
@@ -74,6 +74,6 @@ if __name__ == '__main__':
     pixel_size = 160  # nm #original image pixel size  (effective pixel size = 106 nm)
     T = 1  # tiff stack length - is it the frames?
     #csv_file = 'alpha_tubulin_cell8'  # name of the csv file
-    dir_path = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/1"
-    output_folder = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/1"
+    dir_path = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/7"
+    output_folder = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/7"
     convert_to_tiff_csv_folder(dir_path, output_folder, T, img_size, scale, pixel_size)
