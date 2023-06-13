@@ -141,6 +141,7 @@ if __name__ == '__main__':
                          '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-06-07-51-19-275465/samples_600x256x256x3.npz',
                          '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-06-07-51-19-275465/samples_300x256x256x3.npz']
     indxs = [1000,1000,900,200,900,600,300]
+
     image_path_for_mu_sigma = '/data/GAN_project/CARE/input_n_avg_10_all_no_data_area.tif'
     lamda = 510e-9# 488e-9 # m
     NA = 1.45#1.46

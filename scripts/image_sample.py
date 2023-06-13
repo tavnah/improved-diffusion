@@ -116,17 +116,18 @@ if __name__ == "__main__":
     import numpy as np
     import matplotlib.pyplot as plt
 
+    model_path = "/data/GAN_project/diffusion_tries/mitochondria/tav/openai-2023-04-25-18-02-13-010307/ema_0.9999_080000.pt"
+    #main(model_path, output_path, diffusion_steps=2000, patch_size=256, images_num=10)
     # with np.load('/data/GAN_project/diffusion_tries/samples/openai-2023-04-26-15-04-29-012512/samples_10x256x256x3.npz') as data:
     #    lst = data.files
     #    for item in data[lst[0]]:
     #        plt.imshow(item)
     #        plt.show()
-    output_path = "/data/GAN_project/diffusion_tries/samples/shareloc/1305/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
-    model_path = "/data/GAN_project/diffusion_tries/microtubules/tav/alpha_tubulin_scale_4/openai-2023-05-18-23-45-52-473911/ema_0.9999_046000.pt"
     patch_size = 256
-    diffusion_steps = 2000
+    diffusion_steps = 2000 #2000
     for i in range(1, 10):
-        images_num = i * 300
+        output_path = "/data/GAN_project/diffusion_tries/samples/mitochondria/1106/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+        images_num = 300
         main(model_path, output_path, diffusion_steps, patch_size, images_num)
     #images_num = 200
     #main(model_path, output_path, diffusion_steps,patch_size, images_num)

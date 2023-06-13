@@ -99,11 +99,11 @@ def find_similar_patch_for_generated_patches(generated_patches_path, image_folde
 
         plt.show()
 
-def show_10_patches(generated_patches_path):
+def show_10_patches(generated_patches_path, num):
     with np.load(generated_patches_path) as data:
         lst = data.files
         total_patches_num = len(data[lst[0]])
-        ten_patches = data[lst[0]][:10]
+        ten_patches = data[lst[0]][0 + num:10+num]
         rows_num = 2
         cols_num = 5
         #plt.figure(figsize=(30, 10))
@@ -136,8 +136,17 @@ def check_script_with_exist_path(patch_path, images_folder_path, resize_factor=1
 if __name__ == "__main__":
     patch_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/patches_o0.25/patch218_3.jpg'
     images_folder_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/HR_image'
-    check_script_with_exist_path(patch_path,images_folder_path)
-    #show_10_patches('/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-01-09-20-48-674744/samples_10x256x256x3.npz')
+    #check_script_with_exist_path(patch_path,images_folder_path)
+    show_10_patches('/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz', 0)
+    show_10_patches(
+        '/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz',
+        10)
+    show_10_patches(
+        '/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz',
+        20)
+    show_10_patches(
+        '/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz',
+        30)
 
 
     orig_patches_folder = '/data/GAN_project/microtubules/onit/HR'

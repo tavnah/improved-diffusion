@@ -66,14 +66,37 @@ def remove_outliers(patch):
     #patch = patch * 255
     return patch
 
+def from_np_to_tif(np_array, output_folder, file_name):
+    ''' the function get a numpy array and save it as tiff file'''
+    im = Image.fromarray(np_array)
+    im.save(os.path.join(output_folder, '{}.tiff'.format(file_name)))
 
+def folder_of_npz_to_tiff(npz_folder, output_folder):
+    for file in os.listdir(npz_folder):
+        if file.endswith(".npz"):
+            file_name = file.split('.')[0]
+            npz = np.load(os.path.join(npz_folder, file))
+            care3 = npz['care']
+            care = care3[:,:,0]
+            hr = care3[:,:,1]
+            ours3 = npz['ours']
+            ours = ours3[:,:,0]
+            from_np_to_tif(care, output_folder, file_name + '_care')
+            from_np_to_tif(hr, output_folder, file_name + '_gt')
+            from_np_to_tif(ours, output_folder, file_name + '_ours')
 
 if __name__ == '__main__':
     img_size = 256  # low resolution image hight/ width
     scale = 4  # int(0.1609743 /106)  #resolution improvement
-    pixel_size = 160  # nm #original image pixel size  (effective pixel size = 106 nm)
+    pixel_size = 106  # nm #original image pixel size  (effective pixel size = 106 nm)
     T = 1  # tiff stack length - is it the frames?
     #csv_file = 'alpha_tubulin_cell8'  # name of the csv file
-    dir_path = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/7"
-    output_folder = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/7"
-    convert_to_tiff_csv_folder(dir_path, output_folder, T, img_size, scale, pixel_size)
+    #dir_path = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/3"
+    #output_folder = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/3"
+    dir_path = "/data/GAN_project/test_imgs/shareloc2/5"
+    output_folder = "/data/GAN_project/test_imgs/shareloc2/5"
+
+    #convert_to_tiff_csv_folder(dir_path, output_folder, T, img_size, scale, pixel_size)
+    npz_folder = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/output_orig_1000"
+    output_folder = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/output_orig_1000"
+    folder_of_npz_to_tiff(npz_folder, output_folder)
