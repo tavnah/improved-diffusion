@@ -9,6 +9,8 @@ from PIL import Image
 from CARE.CSBDeep.csbdeep.io import save_training_data
 import os
 from perlin_numpy import generate_perlin_noise_2d
+from skimage.transform import resize
+
 
 
 def get_LR_HR_couples(patches_path, output_folder, image_path_for_mu_sigma, NA, lamda, pixel_size, check_percenage=False, percentage_threshold=0.2, threshold = 0.4, ind=0):
@@ -54,17 +56,23 @@ def get_LR_HR_couples(patches_path, output_folder, image_path_for_mu_sigma, NA, 
 
 def LR_from_HR(HR_patch, image_path_for_mu_sigma, NA, lamda, pixel_size, show_progress=False):
 
-    threshold = 0.4
+    threshold = 0.2
     threshold_patch = HR_patch.copy()
-    threshold_patch[threshold_patch < threshold] = 0
+    threshold_patch[threshold_patch < threshold] = 0 # FOR MICROTUBULES
+
+    #smooth image with gaussian filter
+    smoothed_patch = gaussian_filter(threshold_patch, sigma=1, truncate=4, mode='reflect')
 
     w, l = HR_patch.shape
     #add perlin noise
     #perlin_noise = PerlinNoise() #octaves = ?
     #perlin_noise_img = np.array([[perlin_noise([i / w, j / l]) for j in range(w)] for i in range(l)])
-    perlin_noise = generate_perlin_noise_2d((w, l), (4, 4))
+    new_w = w - (w%16)
+    new_l = l - (l%16)
+    patch = smoothed_patch[:new_w, :new_l]
+    perlin_noise = generate_perlin_noise_2d((new_w, new_l), (4, 4))
     perlin_noise = perlin_noise - np.min(perlin_noise)
-    hr_perlin_noise = threshold_patch + (1/6)* perlin_noise
+    hr_perlin_noise = patch #+ (1/12)* perlin_noise
 
     #convolve with PSF
     psf_sigma = 0.25 * (lamda/pixel_size) / NA  #3 for trying because it too good
@@ -72,14 +80,14 @@ def LR_from_HR(HR_patch, image_path_for_mu_sigma, NA, lamda, pixel_size, show_pr
 
     #add poisson noise
     poisson_noise = np.random.poisson(hr_convolved + 0.5)
-    hr_convolved_poisson = hr_convolved + (1/40)*poisson_noise
+    hr_convolved_poisson = hr_convolved + (1/30)*poisson_noise#(1/40)*poisson_noise
 
     #add gaussian noise
     mu, std = calculate_mu_sigma_from_tiff(image_path_for_mu_sigma)
     #mu = mu / 255
     #std = std / 255
     gaussian_noise = np.random.normal(mu, std, hr_convolved_poisson.shape)
-    hr_convolved_poisson_gaussian = hr_convolved_poisson + (1/40)*gaussian_noise
+    hr_convolved_poisson_gaussian = hr_convolved_poisson + (1/30)*gaussian_noise#(1/40)*gaussian_noise
 
     #show figure of original patch, patch after perlin noise, patch after convolution, patch after poisson noise, patch after gaussian noise
     if show_progress:
@@ -124,16 +132,18 @@ def show_ten_samples_of_LR_patches(npz1, npz2, label = 'X'):
 
 if __name__ == '__main__':
 
+
+
     #patches_path = '/data/GAN_project/diffusion_tries/samples/openai-2023-05-02-08-03-36-590047/samples_10x256x256x3.npz'
     #patches_path = '/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz'
-    patches_path ='/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-25-11-10-07-242376/samples_100x256x256x3.npz'
+    # patches_path ='/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-25-11-10-07-242376/samples_100x256x256x3.npz'
+    #
+    # patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-29-07-34-28-426488/samples_1000x256x256x3.npz'
+    # patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-02-23-15-23-909604/samples_1000x256x256x3.npz'
+    # patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-04-09-37-10-595522/samples_900x256x256x3.npz'
+    # patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-04-09-38-33-595326/samples_200x256x256x3.npz'
 
-    patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-29-07-34-28-426488/samples_1000x256x256x3.npz'
-    patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-02-23-15-23-909604/samples_1000x256x256x3.npz'
-    patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-04-09-37-10-595522/samples_900x256x256x3.npz'
-    patches_path = '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-04-09-38-33-595326/samples_200x256x256x3.npz'
-
-    all_patches_paths = ['/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-29-07-34-28-426488/samples_1000x256x256x3.npz',
+    all_patches_paths_microtub = ['/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-05-29-07-34-28-426488/samples_1000x256x256x3.npz',
                          '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-02-23-15-23-909604/samples_1000x256x256x3.npz',
                          '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-04-09-37-10-595522/samples_900x256x256x3.npz',
                          '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-04-09-38-33-595326/samples_200x256x256x3.npz',
@@ -142,39 +152,52 @@ if __name__ == '__main__':
                          '/data/GAN_project/diffusion_tries/samples/shareloc/1305/openai-2023-06-06-07-51-19-275465/samples_300x256x256x3.npz']
     indxs = [1000,1000,900,200,900,600,300]
 
-    image_path_for_mu_sigma = '/data/GAN_project/CARE/input_n_avg_10_all_no_data_area.tif'
-    lamda = 510e-9# 488e-9 # m
-    NA = 1.45#1.46
+    image_path_for_mu_sigma = '/data/GAN_project/CARE/input_n_avg_10_all_no_data_area.tif' #microtubules
+    lamda = 660e-9  # 510e-9 for microtubules, 660e-9 for mitochondria
+    NA = 1.49#1.46 for microtubules, 1.49 for mitochondria
     scaling = 4
     pixel_size = 0.106e-6/scaling # m
 
-    CARE_patches_path = '/data/GAN_project/CARE/Synthetic_tubulin_gfp/train_data/data_label.npz'
-    train_patches_path = '/data/GAN_project/CARE/simulated_LR/train_data/shareloc_4_small/1000_no_dense_thresh0.1_higherSNR_lowerPSF/train_data.npz'
-    show_ten_samples_of_LR_patches(CARE_patches_path,train_patches_path)
-    # tif = TIFF.open('/data/GAN_project/CARE/real_data/alpha_tubulin_cell8_cropped.tif', mode='r')
-    # HR_image = tif.read_image()
-    # HR_image = color.rgb2gray(HR_image)
-    # HR_image = (HR_image - np.min(HR_image)) / (np.max(HR_image) - np.min(HR_image))
-    # HR_image = ((HR_image * 254) + 1).astype('uint8')
-    # LR_image = LR_from_HR(HR_image, image_path_for_mu_sigma, NA, lamda, pixel_size, show_progress=True)
+    # CARE_patches_path = '/data/GAN_project/CARE/Synthetic_tubulin_gfp/train_data/data_label.npz'
+    # train_patches_path = '/data/GAN_project/CARE/simulated_LR/train_data/shareloc_4_small/1000_no_dense_thresh0.1_higherSNR_lowerPSF/train_data.npz'
+    # show_ten_samples_of_LR_patches(CARE_patches_path,train_patches_path)
+    microtubules = False
+    mitochondria = True
+    one_image = False
+    # ======= microtubules =======
+    output_folder = '/data/GAN_project/CARE/simulated_LR/train_data/shareloc_4_small/1000_thresh0.1_higherSNR_pix0.08_lamb510_NA1.46'
+    if microtubules:
+        for i in range(len(indxs)):
+            if i ==0:
+                cur_ind = 0
+            else:
+                cur_ind += indxs[i-1]
+            cur_path = all_patches_paths_microtub[i]
+            get_LR_HR_couples(cur_path, output_folder, image_path_for_mu_sigma, NA, lamda, pixel_size,
+                              check_percenage=True, percentage_threshold=0.1, threshold = 0.6, ind=cur_ind)
 
-    output_folder = '/data/GAN_project/CARE/simulated_LR/train_data/shareloc_4_small/1000_no_dense_thresh0.1_higherSNR_lowerPSF'
+    # ======= mitochondria =======
+    output_folder_mito = '/data/GAN_project/CARE/simulated_LR/train_data/shareloc_4_small/mitochondria/thresh0.18_pix0.106_lamb660_NA1.49_smoothed_noperlin'
+    patches_mito_folder = '/data/GAN_project/diffusion_tries/samples/mitochondria/1106'
+    cur_ind = 0
+    if mitochondria:
+        for folder in os.listdir(patches_mito_folder):
+            if folder.startswith('openai'):
+                for file in os.listdir(os.path.join(patches_mito_folder, folder)):
+                    if file.endswith('.npz'):
+                        patches_path = os.path.join(patches_mito_folder, folder, file)
+                        get_LR_HR_couples(patches_path, output_folder_mito, image_path_for_mu_sigma, NA, lamda, pixel_size,
+                                          check_percenage=True, percentage_threshold=0.18, threshold = 0.6, ind = cur_ind)
+                        cur_ind += int(file.split('_')[1].split('x')[0])
 
-    for i in range(len(indxs)):
-        if i ==0:
-            cur_ind = 0
-        else:
-            cur_ind += indxs[i-1]
-        cur_path = all_patches_paths[i]
-        get_LR_HR_couples(cur_path, output_folder, image_path_for_mu_sigma, NA, lamda, pixel_size,
-                          check_percenage=True, percentage_threshold=0.1, threshold = 0.6, ind=cur_ind)
+    if one_image:
+        hr_im_path = '/data/GAN_project/test_imgs/shareloc_mit/data.tiff'
+        output_path = '/data/GAN_project/test_imgs/shareloc_mit/data_LR_2.tiff'
 
-
-    # with np.load(patches_path) as data:
-    #    lst = data.files
-    #    for patch in data[lst[0]]:
-    #        patch = color.rgb2gray(patch)
-    #        patch = (patch - np.min(patch)) / (np.max(patch) - np.min(patch))
-    #        patch = ((patch*254) + 1).astype('uint8') # for poisson lamda not to be 0
-    #        lr = LR_from_HR(patch, image_path_for_mu_sigma, NA, lamda, pixel_size, show_progress=True)
-    #        print('hey')
+        hr_im = Image.open(hr_im_path)
+        hr_np = np.asarray(hr_im)
+        lr_np = LR_from_HR(hr_np, image_path_for_mu_sigma, NA, lamda, pixel_size, show_progress=True)
+        new_size = (int(lr_np.shape[0] // 4), int(lr_np.shape[1] // 4))
+        lr_np = resize(lr_np, new_size)
+        lr_im = Image.fromarray(lr_np)
+        lr_im.save(output_path)

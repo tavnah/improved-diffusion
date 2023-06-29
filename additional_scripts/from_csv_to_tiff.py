@@ -26,8 +26,11 @@ def from_csv_to_tiff(T, img_size, scale, csv_file , pixel_size , dir_path, outpu
             #    i += 1
             #    continue
             # check that indices do not exceed image size
-            x = float(my_data[1])*scale/pixel_size
-            y = float(my_data[2])*scale/pixel_size
+            if my_data[2] == 'nan' or my_data[3] == 'nan':
+                continue
+            x = float(my_data[2])*scale/pixel_size
+            y = float(my_data[3])*scale/pixel_size
+
             if(int(y) < 0 or
                     int(x) < 0 or
                     int(y) >= img_size*scale or
@@ -96,7 +99,9 @@ if __name__ == '__main__':
     dir_path = "/data/GAN_project/test_imgs/shareloc2/5"
     output_folder = "/data/GAN_project/test_imgs/shareloc2/5"
 
-    #convert_to_tiff_csv_folder(dir_path, output_folder, T, img_size, scale, pixel_size)
+    dir_path = '/data/GAN_project/test_imgs/shareloc_mit'
+    output_folder = '/data/GAN_project/test_imgs/shareloc_mit'
+    convert_to_tiff_csv_folder(dir_path, output_folder, T, img_size, scale, pixel_size)
     npz_folder = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/output_orig_1000"
     output_folder = "/data/GAN_project/test_imgs/shareloc_MT3D_160530_C1C2_758K/output_orig_1000"
     folder_of_npz_to_tiff(npz_folder, output_folder)

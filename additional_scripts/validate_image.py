@@ -13,7 +13,7 @@ import torch
 
 def find_similar_patch_from_one_image(patch, image):
 
-    result = cv2.matchTemplate(image, patch, cv2.TM_SQDIFF_NORMED)
+    result = cv2.matchTemplate(image, patch, cv2.TM_CCOEFF_NORMED)
     #result = cv2.matchTemplate(image, patch, cv2.TM_CCORR)
     #result = cv2.matchTemplate(image, patch, cv2.TM_SQDIFF)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
@@ -69,35 +69,53 @@ def find_most_similar_patch(patch, images_folder_path, resize_factor=1):
 
     return patch_couple
 
-def find_similar_patch_for_generated_patches(generated_patches_path, image_folder_path, resize_factor=1):
-    with np.load(generated_patches_path) as data:
-        lst = data.files
-        total_patches_num = len(data[lst[0]])
-        rows_num = 3
-        cols_num = total_patches_num
-        plt.figure(figsize=(30, 10))
-        for i, patch in enumerate(data[lst[0]]):
-            bw_patch = color.rgb2gray(patch)
-            if np.max(bw_patch) < 2:
-                bw_patch = bw_patch * 255
-                bw_patch = np.uint8(bw_patch)
-            aug_patch, similar_patch, _ = find_most_similar_patch(bw_patch, image_folder_path, resize_factor)
-            diff_patches = np.zeros((aug_patch.shape[0],aug_patch.shape[1],3))
-            diff_patches[:,:,0] = aug_patch
-            diff_patches[:,:,1] = similar_patch
-            diff_patches = diff_patches.astype(np.uint8)
+def find_similar_patch_for_generated_patches(generated_patches_path, image_folder_path, resize_factor=1, patches_num=10):
+    #check if generated_patches_path is a npz
+    if generated_patches_path.endswith('.npz'):
+       data = np.load(generated_patches_path)
+       lst = data.files
+       patches = data[lst[0]][18:18+patches_num]
+    else:
+        patches = []
+        for file in os.listdir(generated_patches_path):
+            if file.endswith('.tif'):
+                cur_path = os.path.join(generated_patches_path, file)
+                cur_patch_im = Image.open(cur_path)
+                cur_patch_np = np.asarray(cur_patch_im)
+                patches.append(cur_patch_np)
+            if len(patches) == 4*patches_num:
+                break
+        #convert patches to np array
+        patches = np.array(patches[30:])
 
-            plt.subplot(rows_num, cols_num, i+1)
-            plt.imshow(aug_patch, cmap='gray')
-            plt.title(f'patch {i}')
-            plt.subplot(rows_num, cols_num, i+1+cols_num)
-            plt.imshow(similar_patch, cmap='gray')
-            plt.title(f'matched patch {i}')
-            plt.subplot(rows_num, cols_num, i + 1 + 2*cols_num)
-            plt.imshow(diff_patches)
-            plt.title(f'diff {i}')
 
-        plt.show()
+
+    #total_patches_num = len(data[lst[0]])
+    rows_num = 3
+    cols_num = patches_num
+    plt.figure(figsize=(30, 10))
+    for i, patch in enumerate(patches):
+        bw_patch = color.rgb2gray(patch)
+        if np.max(bw_patch) < 2:
+            bw_patch = bw_patch * 255
+            bw_patch = np.uint8(bw_patch)
+        aug_patch, similar_patch, _ = find_most_similar_patch(bw_patch, image_folder_path, resize_factor)
+        diff_patches = np.zeros((aug_patch.shape[0],aug_patch.shape[1],3))
+        diff_patches[:,:,0] = aug_patch
+        diff_patches[:,:,1] = similar_patch
+        diff_patches = diff_patches.astype(np.uint8)
+
+        plt.subplot(rows_num, cols_num, i+1)
+        plt.imshow(aug_patch, cmap='gray')
+        plt.title(f'patch {i}')
+        plt.subplot(rows_num, cols_num, i+1+cols_num)
+        plt.imshow(similar_patch, cmap='gray')
+        plt.title(f'matched patch {i}')
+        plt.subplot(rows_num, cols_num, i + 1 + 2*cols_num)
+        plt.imshow(diff_patches)
+        plt.title(f'diff {i}')
+
+    plt.show()
 
 def show_10_patches(generated_patches_path, num):
     with np.load(generated_patches_path) as data:
@@ -137,16 +155,16 @@ if __name__ == "__main__":
     patch_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/patches_o0.25/patch218_3.jpg'
     images_folder_path = '/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/one_image/HR_image'
     #check_script_with_exist_path(patch_path,images_folder_path)
-    show_10_patches('/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz', 0)
-    show_10_patches(
-        '/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz',
-        10)
-    show_10_patches(
-        '/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz',
-        20)
-    show_10_patches(
-        '/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz',
-        30)
+    #show_10_patches('/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz', 0)
+    # show_10_patches(
+    #     '/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz',
+    #     10)
+    # show_10_patches(
+    #     '/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz',
+    #     20)
+    # show_10_patches(
+    #     '/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-11-22-46-03-883931/samples_300x256x256x3.npz',
+    #     30)
 
 
     orig_patches_folder = '/data/GAN_project/microtubules/onit/HR'
@@ -178,8 +196,13 @@ if __name__ == "__main__":
     #patches_path = r'C:\Users\tav33\Courses\ProjectGAN\data\patches_q0.01q0.99'
     #show_10_patches(patches_path)
 
+    orig_patches_folder = '/data/GAN_project/tiff_files/good'
+    patches_path = '/data/GAN_project/CARE/simulated_LR/train_data/shareloc_4_small/1000_thresh0.1_higherSNR_pix0.08_lamb510_NA1.46/high'
+    find_similar_patch_for_generated_patches(patches_path, orig_patches_folder, resize_factor=3, patches_num=10)
 
-    #find_similar_patch_for_generated_patches(patches_path, orig_patches_folder,3 )
+    orig_patches_folder = '/data/GAN_project/mitochondria/onit/HR'
+    patches_path = '/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-13-01-17-54-876341/samples_300x256x256x3.npz'
+    #find_similar_patch_for_generated_patches(patches_path, orig_patches_folder, 1 )
 
     # with np.load('/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz') as data:
     #    lst = data.files
