@@ -125,9 +125,13 @@ if __name__ == "__main__":
     #        plt.show()
     patch_size = 256
     diffusion_steps = 2000 #2000
+    model_path = '/data/GAN_project/diffusion_tries/mitochondria/shareloc/openai-2023-06-30-08-38-22-542186/ema_0.9999_148000.pt'
     for i in range(1, 10):
-        output_path = "/data/GAN_project/diffusion_tries/samples/mitochondria/1106/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+        #output_path = "/data/GAN_project/diffusion_tries/samples/mitochondria/1106/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+        output_path = "/data/GAN_project/diffusion_tries/samples/mitochondria/shareloc/3006/" + datetime.datetime.now().strftime(
+            "openai-%Y-%m-%d-%H-%M-%S-%f")
         images_num = 300
         main(model_path, output_path, diffusion_steps, patch_size, images_num)
-    #images_num = 200
-    #main(model_path, output_path, diffusion_steps,patch_size, images_num)
+    # output_path = '/data/GAN_project/diffusion_tries/samples/mitochondria/shareloc/3006'
+    # images_num = 10
+    # main(model_path, output_path, diffusion_steps,patch_size, images_num)

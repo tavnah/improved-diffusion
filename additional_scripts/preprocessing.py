@@ -196,6 +196,7 @@ if __name__ == '__main__':
 
     #main_fldr = r"C:\Users\tav33\Documents\GAN_big\try_data\DL"
     main_fldr = "/data/GAN_project/tiff_files/good"
+    main_fldr = "/data/GAN_project/mitochondria/shareloc/tiff_files"
     patch_size = (256, 256)
     overlap = 0.25
     crop_start = (0,0)
@@ -203,7 +204,7 @@ if __name__ == '__main__':
     pixel_size = 106e-9
     #labels_path ='/data/GAN_project/labels_try_data.csv'
     #labels_path = r'C:\Users\tav33\Courses\ProjectGAN\labels_try_data.csv'
-    output_folder = '/data/GAN_project/microtubules/shareloc/1305'
+    output_folder = '/data/GAN_project/mitochondria/shareloc/patches_256x256_ol0.25'
     patches, orig_images= create_patches_for_type(main_fldr, patch_size, overlap, crop_start, n_rotations)
     save_patches(patches, output_folder)
     # from micro_dataset import MicroscopePatchesDataset

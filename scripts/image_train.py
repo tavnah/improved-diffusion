@@ -64,7 +64,7 @@ def main():
 
 
 def create_argparser():
-    defaults = dict(data_dir="/data/GAN_project/microtubules/shareloc/alpha_tubulin_scale_4/patches_ol0.25",
+    defaults = dict(data_dir='/data/GAN_project/mitochondria/shareloc/patches_256x256_ol0.25',
         schedule_sampler="uniform",
         lr=1e-4,
         weight_decay=0.0,
@@ -86,6 +86,9 @@ def create_argparser():
 
 
 if __name__ == "__main__":
-    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/alpha_tubulin_scale_4/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
-    os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/only_good_imgs/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+    #os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/alpha_tubulin_scale_4/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+    #os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/only_good_imgs/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+    os.environ[
+        "OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/mitochondria/shareloc/" + datetime.datetime.now().strftime(
+        "openai-%Y-%m-%d-%H-%M-%S-%f")
     main()

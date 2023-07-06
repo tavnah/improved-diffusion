@@ -9,11 +9,12 @@ from skimage import color
 from skimage.transform import resize
 import cv2
 import torch
+from libtiff import TIFF
 
 
 def find_similar_patch_from_one_image(patch, image):
 
-    result = cv2.matchTemplate(image, patch, cv2.TM_CCOEFF_NORMED)
+    result = cv2.matchTemplate(image, patch, cv2.TM_CCORR_NORMED)
     #result = cv2.matchTemplate(image, patch, cv2.TM_CCORR)
     #result = cv2.matchTemplate(image, patch, cv2.TM_SQDIFF)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
@@ -24,6 +25,7 @@ def find_similar_patch_from_one_image(patch, image):
     match_bottom_right = (match_top_left[0] + template_width, match_top_left[1] + template_height)
     # Extract the matched patch from the original image
     matched_patch = image[match_top_left[1]:match_bottom_right[1], match_top_left[0]:match_bottom_right[0]]
+
     return matched_patch, max_val
 
 def find_similar_patch_augment(patch, image):
@@ -51,11 +53,15 @@ def find_most_similar_patch(patch, images_folder_path, resize_factor=1):
     for image in images_folder.iterdir():
         if image.is_file():
             image_path = image.__fspath__()
-            image = plt.imread(image_path)
-            if image.shape[-1] == 4:
-                bw_image = color.rgb2gray(color.rgba2rgb(image))
+            if image_path.endswith('.tiff') or image_path.endswith('.tif'):
+                tif = TIFF.open(image_path)
+                bw_image = tif.read_image()
             else:
-                bw_image = color.rgb2gray(image)
+                im = plt.imread(image_path)
+                if image.shape[-1] == 4:
+                    bw_image = color.rgb2gray(color.rgba2rgb(image))
+                else:
+                    bw_image = color.rgb2gray(im)
             new_size = tuple([x // resize_factor for x in bw_image.shape])
             res_image = resize(bw_image, new_size)
             bw_image = res_image
@@ -74,11 +80,11 @@ def find_similar_patch_for_generated_patches(generated_patches_path, image_folde
     if generated_patches_path.endswith('.npz'):
        data = np.load(generated_patches_path)
        lst = data.files
-       patches = data[lst[0]][18:18+patches_num]
+       patches = data[lst[0]][:patches_num]
     else:
         patches = []
         for file in os.listdir(generated_patches_path):
-            if file.endswith('.tif'):
+            if file.endswith('.tiff') or file.endswith('.tif'):
                 cur_path = os.path.join(generated_patches_path, file)
                 cur_patch_im = Image.open(cur_path)
                 cur_patch_np = np.asarray(cur_patch_im)
@@ -86,7 +92,7 @@ def find_similar_patch_for_generated_patches(generated_patches_path, image_folde
             if len(patches) == 4*patches_num:
                 break
         #convert patches to np array
-        patches = np.array(patches[30:])
+        patches = np.array(patches)
 
 
 
@@ -198,11 +204,16 @@ if __name__ == "__main__":
 
     orig_patches_folder = '/data/GAN_project/tiff_files/good'
     patches_path = '/data/GAN_project/CARE/simulated_LR/train_data/shareloc_4_small/1000_thresh0.1_higherSNR_pix0.08_lamb510_NA1.46/high'
-    find_similar_patch_for_generated_patches(patches_path, orig_patches_folder, resize_factor=3, patches_num=10)
+    #find_similar_patch_for_generated_patches(patches_path, orig_patches_folder, resize_factor=3, patches_num=10)
 
     orig_patches_folder = '/data/GAN_project/mitochondria/onit/HR'
     patches_path = '/data/GAN_project/diffusion_tries/samples/mitochondria/1106/openai-2023-06-13-01-17-54-876341/samples_300x256x256x3.npz'
     #find_similar_patch_for_generated_patches(patches_path, orig_patches_folder, 1 )
+
+    orig_patches_folder = "/data/GAN_project/mitochondria/shareloc/tiff_files"
+    patches_path = '/data/GAN_project/diffusion_tries/samples/mitochondria/shareloc/3006/old/samples_10x256x256x3.npz'
+    find_similar_patch_for_generated_patches(patches_path, orig_patches_folder, 1)
+    #show_10_patches(patches_path, 0)
 
     # with np.load('/data/GAN_project/diffusion_tries/openai-2023-03-31-15-33-00-056364/samples_10x64x64x3.npz') as data:
     #    lst = data.files
